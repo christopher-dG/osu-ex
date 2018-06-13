@@ -24,3 +24,6 @@ osu_api-*.tar
 
 # Library projects should not commit mix.lock.
 /mix.lock
+
+# No need to share configuration.
+/config/config.exs

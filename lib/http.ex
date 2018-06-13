@@ -12,14 +12,124 @@ defmodule OsuAPI.HTTP do
     Keyword.update(options, :params, %{k: api_key}, &Map.put_new(&1, :k, api_key))
   end
 
-  # Process each list element.
-  defp process(list) when is_list(list), do: Enum.map(list, &process/1)
-  # Convert each map key to an atom and process each map value.
-  defp process(map) when is_map(map) do
-    Enum.map(map, fn {k, v} -> {String.to_atom(k), process(v)} end)
+  # Special cases.
+
+  defp process({"approved", v}) do
+    {:approved,
+     case v do
+       "-2" -> :graveyard
+       "-1" -> :wip
+       "0" -> :pending
+       "1" -> :ranked
+       "2" -> :approved
+       "3" -> :qualified
+       "4" -> :loved
+       _ -> process(v)
+     end}
   end
 
-  defp process(nil), do: nil
+  defp process({"genre_id", v}) do
+    # Note that we rename to just :genre here.
+    {:genre,
+     case v do
+       "0" -> :any
+       "1" -> :unspecified
+       "2" -> :video_game
+       "3" -> :anime
+       "4" -> :rock
+       "5" -> :pop
+       "6" -> :other
+       "7" -> :novelty
+       "9" -> :hip_hop
+       "10" -> :electronic
+       _ -> v
+     end}
+  end
+
+  defp process({"language_id", v}) do
+    # Note that we rename to just :language here.
+    {:language,
+     case v do
+       "0" -> :any
+       "1" -> :other
+       "2" -> :english
+       "3" -> :japanese
+       "4" -> :chinese
+       "5" -> :instrumental
+       "6" -> :korean
+       "7" -> :french
+       "8" -> :german
+       "9" -> :swedish
+       "10" -> :spanish
+       "11" -> :italian
+       _ -> process(v)
+     end}
+  end
+
+  defp process({"mode", v}) do
+    {:mode,
+     case v do
+       "0" -> :standard
+       "1" -> :taiko
+       "2" -> :catch
+       "3" -> :mania
+       _ -> process(v)
+     end}
+  end
+
+  defp process({"play_mode", v}) do
+    {:play_mode,
+     case v do
+       "0" -> :standard
+       "1" -> :taiko
+       "2" -> :catch
+       "3" -> :mania
+       _ -> process(v)
+     end}
+  end
+
+  defp process({"tags", v}), do: {:tags, String.split(v)}
+
+  defp process({"perfect", v}), do: {:perfect, v == "1"}
+  defp process({"replay_available", v}), do: {:replay_available, v == "1"}
+
+  defp process({"scoring_type", v}) do
+    {:scoring_type,
+     case v do
+       "0" -> :score
+       "1" -> :accuracy
+       "2" -> :combo
+       "3" -> :score_v2
+       _ -> process(v)
+     end}
+  end
+
+  defp process({"team_type", v}) do
+    {:team_type,
+     case v do
+       "0" -> :head_to_head
+       "1" -> :tag_coop
+       "2" -> :team_vs
+       "3" -> :tag_team_vs
+       _ -> process(v)
+     end}
+  end
+
+  defp process({"team", v}) do
+    {:team,
+     case v do
+       "1" -> :blue
+       "2" -> :red
+       _ -> process(v)
+     end}
+  end
+
+  defp process({k, nil}), do: {String.to_atom(k), nil}
+  defp process({k, v}), do: {String.to_atom(k), process(v)}
+
+  # Process collections recursively.
+  defp process(col) when is_list(col) or is_map(col), do: Enum.map(col, &process/1)
+
   # Parse integers, floats, and dates into their native types.
   defp process(scalar) do
     case Integer.parse(scalar) do
@@ -33,11 +143,8 @@ defmodule OsuAPI.HTTP do
 
           _ ->
             case NaiveDateTime.from_iso8601(scalar) do
-              {:ok, n} ->
-                n
-
-              _ ->
-                scalar
+              {:ok, n} -> n
+              _ -> scalar
             end
         end
     end

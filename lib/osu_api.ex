@@ -2,24 +2,23 @@ defmodule OsuAPI do
   @moduledoc """
   **A wrapper around the osu! API.**
 
-  response bodies, with the exception that integers, floats, and dates are
-  parsed into their native types.
-
   # Making Requests
 
-      OsuAPI.get("user", u: "Cookiezi")
+      OsuAPI.get(:user, u: "Cookiezi")
 
   This module uses `HTTPoison` under the hood, so knowing its basics
   will explain most usage patterns. To make a request, use `get/2` or `get!/2`
 
   Rather than passing the full URL, only the part after the "get" prefix is
-  used. So instead of `"https://osu.ppy.sh/api/get_user"`, pass only `"user"`.
+  used. So instead of `"https://osu.ppy.sh/api/get_user"`, pass only `"user"`
+  (`:user` works too).
 
   Request parameters can be passed as a keyword list after the URL.
 
   The return value is just an `HTTPoison.Response`, so the data is in `body`.
-  Response data is identical to the osu! API documentation, except that
-  integers, floats, and dates are parsed to their native types.
+  Response data is mostly identical to the osu! API documentation, except that
+  integers, floats, and dates are parsed to their native types, and enums
+  are converted to their values as atoms.
 
   # API Key
 
