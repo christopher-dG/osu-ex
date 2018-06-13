@@ -4,7 +4,7 @@
 
 **A wrapper around the [osu! API](https://github.com/ppy/osu-api/wiki).**
 
-# Making Requests
+## Making Requests
 
 ```elixir
 OsuAPI.get(:user, u: "Cookiezi")
@@ -24,7 +24,7 @@ Response data is mostly identical to the osu! API documentation, except that
 integers, floats, and dates are parsed to their native types, and enums
 are converted to their values as atoms.
 
-# API Key
+## API Key
 
 To access the osu! API, you need to provide an API key.
 You can pass the `k` parameter to `get` or `get!`if you want,
@@ -34,7 +34,7 @@ but otherwise you can configure its value in `config.exs`:
 config :osu_api, api_key: "<your key here>"
 ```
 
-# Advanced Requests
+## Advanced Requests
 
 As previously mentioned, this module is built on top of `HTTPoison`, which
 means that you can take advantage of extra features such as async requests.
