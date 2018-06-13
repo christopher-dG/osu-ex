@@ -22,3 +22,5 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 osu_api-*.tar
 
+# Library projects should not commit mix.lock.
+/mix.lock
