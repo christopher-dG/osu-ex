@@ -3,5 +3,5 @@ elixir: 1.6.5
 otp_release: 20.3
 
 script:
-  - mix test
+  - mix test --cover
   - mix format --check-formatted

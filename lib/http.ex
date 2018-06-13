@@ -29,7 +29,7 @@ defmodule OsuAPI.HTTP do
   end
 
   defp process({"genre_id", v}) do
-    # Note that we rename to just :genre here.
+    # Note that we rename the key to just :genre here.
     {:genre,
      case v do
        "0" -> :any
@@ -47,7 +47,7 @@ defmodule OsuAPI.HTTP do
   end
 
   defp process({"language_id", v}) do
-    # Note that we rename to just :language here.
+    # Note that we rename the key to just :language here.
     {:language,
      case v do
        "0" -> :any
@@ -128,7 +128,8 @@ defmodule OsuAPI.HTTP do
   defp process({k, v}), do: {String.to_atom(k), process(v)}
 
   # Process collections recursively.
-  defp process(col) when is_list(col) or is_map(col), do: Enum.map(col, &process/1)
+  defp process(list) when is_list(list), do: Enum.map(list, &process/1)
+  defp process(map) when is_map(map), do: map |> Enum.map(&process/1) |> Map.new()
 
   # Parse integers, floats, and dates into their native types.
   defp process(scalar) do
@@ -152,11 +153,8 @@ defmodule OsuAPI.HTTP do
 
   def process_response_body(body) do
     case Poison.decode(body) do
-      {:ok, data} ->
-        process(data)
-
-      {:error, _} ->
-        body
+      {:ok, data} -> process(data)
+      {:error, _} -> body
     end
   end
 end

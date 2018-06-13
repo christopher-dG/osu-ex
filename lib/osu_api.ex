@@ -7,9 +7,9 @@ defmodule OsuAPI do
       OsuAPI.get(:user, u: "Cookiezi")
 
   This module uses `HTTPoison` under the hood, so knowing its basics
-  will explain most usage patterns. To make a request, use `get/2` or `get!/2`
+  will explain most usage patterns. To make a request, use `get/2` or `get!/2`.
 
-  Rather than passing the full URL, only the part after the "get" prefix is
+  Rather than passing the full URL, only the part after the `"get_"` prefix is
   used. So instead of `"https://osu.ppy.sh/api/get_user"`, pass only `"user"`
   (`:user` works too).
 
@@ -23,7 +23,7 @@ defmodule OsuAPI do
   # API Key
 
   To access the osu! API, you need to provide an API key.
-  Yoy can pass the `k` parameter to `get` or `get!`if you want,
+  You can pass the `k` parameter to `get` or `get!`if you want,
   but otherwise you can configure its value in `config.exs`:
 
       config :osu_api, api_key: "<your key here>"
@@ -34,7 +34,7 @@ defmodule OsuAPI do
   means that you can take advantage of extra features such as async requests.
 
   To make a direct HTTP request, use `get/3` or `get!/3`, which work in
-  exactly the same way as the respective `HTTPoison` functions.
+  exactly the same way as their respective `HTTPoison` functions.
   """
 
   @spec get(binary, keyword) :: {:ok, HTTPoison.Response.t()} | {:error, HTTPoison.Error.t()}
