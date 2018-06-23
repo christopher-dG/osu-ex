@@ -43,7 +43,7 @@ defmodule OsuAPITest do
     f = hd(r.body)
     assert is_map(f)
     assert is_atom(f.approved)
-    # NaiveDateTimes are structs, and structs are maps.
+    # DateTimes are structs, and structs are maps.
     assert is_map(f.approved_date)
     assert is_map(f.last_update)
     assert is_binary(f.artist)

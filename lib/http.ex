@@ -143,8 +143,8 @@ defmodule OsuAPI.HTTP do
             f
 
           _ ->
-            case NaiveDateTime.from_iso8601(scalar) do
-              {:ok, n} -> n
+            case DateTime.from_iso8601(scalar <> "Z") do
+              {:ok, d, _} -> d
               _ -> scalar
             end
         end
