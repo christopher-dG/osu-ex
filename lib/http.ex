@@ -12,7 +12,35 @@ defmodule OsuAPI.HTTP do
     Keyword.update(options, :params, %{k: api_key}, &Map.put_new(&1, :k, api_key))
   end
 
-  # Special cases.
+  def process_response_body(body) do
+    case Poison.decode(body) do
+      {:ok, data} -> process(data)
+      {:error, _} -> body
+    end
+  end
+
+  # Response body JSON parsing.
+
+  # String lists.
+  defp process({"tags", v}), do: {:tags, String.split(v)}
+
+  # Booleans.
+  defp process({"perfect", v}), do: {:perfect, v == "1"}
+  defp process({"replay_available", v}), do: {:replay_available, v == "1"}
+
+  # These fields should always be strings but can appear as numbers.
+  defp process({"artist", v}), do: {:artist, v}
+  defp process({"creator", v}), do: {:creator, v}
+  defp process({"file_md5", v}), do: {:file_md5, v}
+  defp process({"title", v}), do: {:title, v}
+  defp process({"username", v}), do: {:username, v}
+  defp process({"version", v}), do: {:version, v}
+
+  # Special cased types.
+  defp process({k, nil}), do: {String.to_atom(k), nil}
+  defp process({k, v}) when is_integer(v), do: {String.to_atom(k), v}
+
+  # Enums.
 
   defp process({"approved", v}) do
     {:approved,
@@ -88,11 +116,6 @@ defmodule OsuAPI.HTTP do
      end}
   end
 
-  defp process({"tags", v}), do: {:tags, String.split(v)}
-
-  defp process({"perfect", v}), do: {:perfect, v == "1"}
-  defp process({"replay_available", v}), do: {:replay_available, v == "1"}
-
   defp process({"scoring_type", v}) do
     {:scoring_type,
      case v do
@@ -124,14 +147,13 @@ defmodule OsuAPI.HTTP do
      end}
   end
 
-  defp process({k, nil}), do: {String.to_atom(k), nil}
-  defp process({k, v}), do: {String.to_atom(k), process(v)}
-
   # Process collections recursively.
   defp process(list) when is_list(list), do: Enum.map(list, &process/1)
   defp process(map) when is_map(map), do: map |> Enum.map(&process/1) |> Map.new()
 
-  # Parse integers, floats, and dates into their native types.
+  # General cases.
+  defp process({k, v}), do: {String.to_atom(k), process(v)}
+
   defp process(scalar) do
     case Integer.parse(scalar) do
       {i, ""} ->
@@ -148,13 +170,6 @@ defmodule OsuAPI.HTTP do
               _ -> scalar
             end
         end
-    end
-  end
-
-  def process_response_body(body) do
-    case Poison.decode(body) do
-      {:ok, data} -> process(data)
-      {:error, _} -> body
     end
   end
 end

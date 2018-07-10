@@ -9,7 +9,7 @@ defmodule OsuAPI.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "osu! API",
-      source_url: "https://github.com/christopher-dG/osu_api",
+      source_url: "https://github.com/christopher-dG/osu-api-ex",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,

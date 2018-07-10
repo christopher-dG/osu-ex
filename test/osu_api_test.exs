@@ -6,7 +6,7 @@ defmodule OsuAPITest do
     Application.put_env(:osu_api, :api_key, System.get_env("OSU_API_KEY"))
   end
 
-  test "get_user" do
+  test "type inference" do
     r = OsuAPI.get!(:user, u: "cookiezi")
     assert r.status_code === 200
     assert length(r.body) === 1
@@ -33,9 +33,7 @@ defmodule OsuAPITest do
     assert is_integer(c.total_score)
     assert is_integer(c.user_id)
     assert is_binary(c.username)
-  end
 
-  test "get_beatmaps" do
     r = OsuAPI.get!(:beatmaps, b: 129_891)
     assert r.status_code === 200
     assert length(r.body) === 1
@@ -70,5 +68,115 @@ defmodule OsuAPITest do
     assert is_integer(f.playcount)
     assert is_integer(f.passcount)
     assert is_integer(f.max_combo)
+  end
+
+  test "get_beatmaps" do
+    {:ok, r} = OsuAPI.get_beatmaps()
+    assert r.status_code === 200
+    assert length(r.body) === 500
+
+    r = OsuAPI.get_beatmaps!()
+    assert r.status_code === 200
+    assert length(r.body) === 500
+  end
+
+  test "get_beatmap" do
+    {:ok, r} = OsuAPI.get_beatmap(129_891)
+    assert r.status_code === 200
+    assert length(r.body) === 1
+
+    r = OsuAPI.get_beatmap!(129_891)
+    assert r.status_code === 200
+    assert length(r.body) === 1
+  end
+
+  test "get_beatmapset" do
+    {:ok, r} = OsuAPI.get_beatmapset(39804)
+    assert r.status_code === 200
+    assert length(r.body) === 5
+
+    r = OsuAPI.get_beatmapset!(39804)
+    assert r.status_code === 200
+    assert length(r.body) === 5
+  end
+
+  test "get_user" do
+    {:ok, r} = OsuAPI.get_user("cookiezi")
+    assert r.status_code === 200
+    assert length(r.body) === 1
+
+    {:ok, r} = OsuAPI.get_user(124_493)
+    assert r.status_code === 200
+    assert length(r.body) === 1
+
+    r = OsuAPI.get_user!("cookiezi")
+    assert r.status_code === 200
+    assert length(r.body) === 1
+
+    r = OsuAPI.get_user!(124_493)
+    assert r.status_code === 200
+    assert length(r.body) === 1
+  end
+
+  test "get_scores" do
+    {:ok, r} = OsuAPI.get_scores(129_891)
+    assert r.status_code === 200
+    assert length(r.body) === 50
+
+    r = OsuAPI.get_scores!(129_891)
+    assert r.status_code === 200
+    assert length(r.body) === 50
+  end
+
+  test "get_user_best" do
+    {:ok, r} = OsuAPI.get_user_best("cookiezi")
+    assert r.status_code === 200
+    assert length(r.body) === 10
+
+    {:ok, r} = OsuAPI.get_user_best(124_493)
+    assert r.status_code === 200
+    assert length(r.body) === 10
+
+    r = OsuAPI.get_user_best!("cookiezi")
+    assert r.status_code === 200
+    assert length(r.body) === 10
+
+    r = OsuAPI.get_user_best!(124_493)
+    assert r.status_code === 200
+    assert length(r.body) === 10
+  end
+
+  test "get_user_recent" do
+    # We can't guarantee recent plays.
+
+    {:ok, r} = OsuAPI.get_user_recent("cookiezi")
+    assert r.status_code === 200
+
+    {:ok, r} = OsuAPI.get_user_recent(124_493)
+    assert r.status_code === 200
+
+    r = OsuAPI.get_user_recent!("cookiezi")
+    assert r.status_code === 200
+
+    r = OsuAPI.get_user_recent!(124_493)
+    assert r.status_code === 200
+  end
+
+  test "get_match" do
+    {:ok, r} = OsuAPI.get_match(1_933_622)
+    assert r.status_code === 200
+    # This returns %{games: [], match: 0}, I'm not sure if it's user error.
+  end
+
+  test "get_replay" do
+    {:ok, r} = OsuAPI.get_replay(129_891, "cookiezi", 0)
+    assert r.status_code === 200
+    assert is_binary(r.body.content)
+    assert r.body.encoding === "base64"
+
+    r = OsuAPI.get_replay!(129_891, 124_493, 0)
+    assert r.status_code === 200
+    assert is_binary(r.body.content)
+    assert r.body.encoding === "base64"
   end
 end
