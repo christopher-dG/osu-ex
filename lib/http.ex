@@ -13,7 +13,7 @@ defmodule OsuAPI.HTTP do
   end
 
   def process_response_body(body) do
-    case Poison.decode(body) do
+    case Jason.decode(body) do
       {:ok, data} -> process(data)
       {:error, _} -> body
     end

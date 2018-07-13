@@ -23,7 +23,7 @@ defmodule OsuAPI.MixProject do
   defp deps do
     [
       {:httpoison, "~> 1.1"},
-      {:poison, "~> 3.1"},
+      {:jason, "~> 1.1"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:excoveralls, "~> 0.9", only: :test}
     ]
