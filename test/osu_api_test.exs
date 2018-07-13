@@ -73,109 +73,171 @@ defmodule OsuAPITest do
   test "get_beatmaps" do
     {:ok, r} = OsuAPI.get_beatmaps()
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 500
+    assert Enum.all?(r.body, fn b -> Map.has_key?(b, :beatmap_id) end)
 
     r = OsuAPI.get_beatmaps!()
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 500
+    assert Enum.all?(r.body, fn b -> Map.has_key?(b, :beatmap_id) end)
   end
 
   test "get_beatmap" do
     {:ok, r} = OsuAPI.get_beatmap(129_891)
     assert r.status_code === 200
-    assert length(r.body) === 1
+    assert is_map(r.body)
+    assert Map.get(r.body, :beatmap_id) === 129_891
 
     r = OsuAPI.get_beatmap!(129_891)
     assert r.status_code === 200
-    assert length(r.body) === 1
+    assert is_map(r.body)
+    assert Map.get(r.body, :beatmap_id) === 129_891
   end
 
   test "get_beatmapset" do
     {:ok, r} = OsuAPI.get_beatmapset(39804)
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 5
+    assert Enum.all?(r.body, fn b -> Map.get(b, :beatmapset_id) === 39804 end)
 
     r = OsuAPI.get_beatmapset!(39804)
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 5
+    assert Enum.all?(r.body, fn b -> Map.get(b, :beatmapset_id) === 39804 end)
   end
 
   test "get_user" do
     {:ok, r} = OsuAPI.get_user("cookiezi")
     assert r.status_code === 200
-    assert length(r.body) === 1
+    assert is_map(r.body)
+    assert Map.get(r.body, :user_id) === 124_493
 
     {:ok, r} = OsuAPI.get_user(124_493)
     assert r.status_code === 200
-    assert length(r.body) === 1
+    assert is_map(r.body)
+    assert Map.get(r.body, :user_id) === 124_493
 
     r = OsuAPI.get_user!("cookiezi")
     assert r.status_code === 200
-    assert length(r.body) === 1
+    assert is_map(r.body)
+    assert Map.get(r.body, :user_id) === 124_493
 
     r = OsuAPI.get_user!(124_493)
     assert r.status_code === 200
-    assert length(r.body) === 1
+    assert is_map(r.body)
+    assert Map.get(r.body, :user_id) === 124_493
   end
 
   test "get_scores" do
     {:ok, r} = OsuAPI.get_scores(129_891)
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 50
+    assert Enum.all?(r.body, fn s -> Map.has_key?(s, :score_id) end)
 
     r = OsuAPI.get_scores!(129_891)
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 50
+    assert Enum.all?(r.body, fn s -> Map.has_key?(s, :score_id) end)
   end
 
   test "get_user_best" do
     {:ok, r} = OsuAPI.get_user_best("cookiezi")
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 10
+
+    assert Enum.all?(r.body, fn s ->
+      Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
 
     {:ok, r} = OsuAPI.get_user_best(124_493)
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 10
+
+    assert Enum.all?(r.body, fn s ->
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
 
     r = OsuAPI.get_user_best!("cookiezi")
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 10
+
+    assert Enum.all?(r.body, fn s ->
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
 
     r = OsuAPI.get_user_best!(124_493)
     assert r.status_code === 200
+    assert is_list(r.body)
     assert length(r.body) === 10
+
+    assert Enum.all?(r.body, fn s ->
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
   end
 
   test "get_user_recent" do
-    # We can't guarantee recent plays.
+    # We can't guarantee recent plays, so no length checks.
 
     {:ok, r} = OsuAPI.get_user_recent("cookiezi")
     assert r.status_code === 200
+    assert is_list(r.body)
+
+    assert Enum.all?(r.body, fn s ->
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
 
     {:ok, r} = OsuAPI.get_user_recent(124_493)
     assert r.status_code === 200
+    assert is_list(r.body)
+
+    assert Enum.all?(r.body, fn s ->
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
 
     r = OsuAPI.get_user_recent!("cookiezi")
     assert r.status_code === 200
+    assert is_list(r.body)
+
+    assert Enum.all?(r.body, fn s ->
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
 
     r = OsuAPI.get_user_recent!(124_493)
     assert r.status_code === 200
+    assert is_list(r.body)
+
+    assert Enum.all?(r.body, fn s ->
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+           end)
   end
 
   test "get_match" do
     {:ok, r} = OsuAPI.get_match(1_933_622)
     assert r.status_code === 200
+    assert is_map(r.body)
+    assert is_list(Map.get(r.body, :games))
     # This returns %{games: [], match: 0}, I'm not sure if it's user error.
   end
 
   test "get_replay" do
     {:ok, r} = OsuAPI.get_replay(129_891, "cookiezi", 0)
     assert r.status_code === 200
+    assert is_map(r.body)
     assert is_binary(r.body.content)
     assert r.body.encoding === "base64"
 
     r = OsuAPI.get_replay!(129_891, 124_493, 0)
     assert r.status_code === 200
+    assert is_map(r.body)
     assert is_binary(r.body.content)
     assert r.body.encoding === "base64"
   end
