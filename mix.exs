@@ -20,8 +20,6 @@ defmodule OsuAPI.MixProject do
     ]
   end
 
-  def application, do: []
-
   defp deps do
     [
       {:httpoison, "~> 1.1"},
