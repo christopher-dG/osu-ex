@@ -6,33 +6,34 @@ defmodule OsuAPITest do
     Application.put_env(:osu_api, :api_key, System.get_env("OSU_API_KEY"))
   end
 
-  test "type inference" do
+  test "response body value types are converted" do
     r = OsuAPI.get!(:user, u: "cookiezi")
     assert r.status_code === 200
     assert length(r.body) === 1
 
     c = hd(r.body)
     assert is_map(c)
-    assert is_number(c.accuracy)
-    assert is_integer(c.count100)
-    assert is_integer(c.count300)
-    assert is_integer(c.count50)
-    assert is_integer(c.count_rank_a)
-    assert is_integer(c.count_rank_s)
-    assert is_integer(c.count_rank_sh)
-    assert is_integer(c.count_rank_ss)
-    assert is_integer(c.count_rank_ssh)
-    assert is_binary(c.country)
-    assert is_list(c.events)
-    assert is_number(c.level)
-    assert is_integer(c.playcount)
-    assert is_integer(c.pp_rank)
-    assert is_integer(c.pp_country_rank)
-    assert is_number(c.pp_raw)
-    assert is_integer(c.ranked_score)
-    assert is_integer(c.total_score)
-    assert is_integer(c.user_id)
-    assert is_binary(c.username)
+    assert is_number(Map.get(c, :accuracy))
+    assert is_integer(Map.get(c, :count100))
+    assert is_integer(Map.get(c, :count300))
+    assert is_integer(Map.get(c, :count50))
+    assert is_integer(Map.get(c, :count_rank_a))
+    assert is_integer(Map.get(c, :count_rank_s))
+    assert is_integer(Map.get(c, :count_rank_sh))
+    assert is_integer(Map.get(c, :count_rank_ss))
+    assert is_integer(Map.get(c, :count_rank_ssh))
+    assert is_binary(Map.get(c, :country))
+    assert is_list(Map.get(c, :events))
+    assert is_number(Map.get(c, :level))
+    assert is_integer(Map.get(c, :playcount))
+    assert is_number(Map.get(c, :accuracy))
+    assert is_integer(Map.get(c, :pp_rank))
+    assert is_integer(Map.get(c, :pp_country_rank))
+    assert is_number(Map.get(c, :pp_raw))
+    assert is_integer(Map.get(c, :ranked_score))
+    assert is_integer(Map.get(c, :total_score))
+    assert is_integer(Map.get(c, :user_id))
+    assert is_binary(Map.get(c, :username))
 
     r = OsuAPI.get!(:beatmaps, b: 129_891)
     assert r.status_code === 200
@@ -40,34 +41,34 @@ defmodule OsuAPITest do
 
     f = hd(r.body)
     assert is_map(f)
-    assert is_atom(f.approved)
+    assert is_atom(Map.get(f, :approved))
     # DateTimes are structs, and structs are maps.
-    assert is_map(f.approved_date)
-    assert is_map(f.last_update)
-    assert is_binary(f.artist)
-    assert is_integer(f.beatmap_id)
-    assert is_integer(f.beatmapset_id)
-    assert is_number(f.bpm)
-    assert is_binary(f.creator)
-    assert is_number(f.difficultyrating)
-    assert is_number(f.diff_size)
-    assert is_number(f.diff_overall)
-    assert is_number(f.diff_approach)
-    assert is_number(f.diff_drain)
-    assert is_integer(f.hit_length)
-    assert is_binary(f.source)
-    assert is_atom(f.genre)
-    assert is_atom(f.language)
-    assert is_binary(f.title)
-    assert is_integer(f.total_length)
-    assert is_binary(f.version)
-    assert is_binary(f.file_md5)
-    assert is_atom(f.mode)
-    assert is_list(f.tags)
-    assert is_integer(f.favourite_count)
-    assert is_integer(f.playcount)
-    assert is_integer(f.passcount)
-    assert is_integer(f.max_combo)
+    assert is_map(Map.get(f, :approved_date))
+    assert is_map(Map.get(f, :last_update))
+    assert is_binary(Map.get(f, :artist))
+    assert is_integer(Map.get(f, :beatmap_id))
+    assert is_integer(Map.get(f, :beatmapset_id))
+    assert is_number(Map.get(f, :bpm))
+    assert is_binary(Map.get(f, :creator))
+    assert is_number(Map.get(f, :difficultyrating))
+    assert is_number(Map.get(f, :diff_size))
+    assert is_number(Map.get(f, :diff_overall))
+    assert is_number(Map.get(f, :diff_approach))
+    assert is_number(Map.get(f, :diff_drain))
+    assert is_integer(Map.get(f, :hit_length))
+    assert is_binary(Map.get(f, :source))
+    assert is_atom(Map.get(f, :genre))
+    assert is_atom(Map.get(f, :language))
+    assert is_binary(Map.get(f, :title))
+    assert is_integer(Map.get(f, :total_length))
+    assert is_binary(Map.get(f, :version))
+    assert is_binary(Map.get(f, :file_md5))
+    assert is_atom(Map.get(f, :mode))
+    assert is_list(Map.get(f, :tags))
+    assert is_integer(Map.get(f, :favourite_count))
+    assert is_integer(Map.get(f, :playcount))
+    assert is_integer(Map.get(f, :passcount))
+    assert is_integer(Map.get(f, :max_combo))
   end
 
   test "get_first sets body to nil if no search results" do
@@ -163,7 +164,7 @@ defmodule OsuAPITest do
     assert length(r.body) === 10
 
     assert Enum.all?(r.body, fn s ->
-      Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
+             Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
            end)
 
     {:ok, r} = OsuAPI.get_user_best(124_493)
@@ -230,12 +231,13 @@ defmodule OsuAPITest do
            end)
   end
 
+  @tag skip: "can't find a match, response body doesn't follow API docs"
   test "get_match" do
     {:ok, r} = OsuAPI.get_match(1_933_622)
     assert r.status_code === 200
     assert is_map(r.body)
+    assert is_map(Map.get(r.body, :match))
     assert is_list(Map.get(r.body, :games))
-    # This returns %{games: [], match: 0}, I'm not sure if it's user error.
   end
 
   test "get_replay" do

@@ -31,6 +31,7 @@ the following:
 
 * The response body of functions which return at most one result (`get_user`,
   `get_beatmap`, etc.) is a single map, instead of a list containing one map.
+  If no result is found, then the body is `nil`, rather than an empty list.
 * Numbers, booleans, and dates are parsed to their native types, and enums
   are converted to their values as atoms.
 * Enums whose names end in "_id" have the suffix removed, since the atoms aren't IDs.
