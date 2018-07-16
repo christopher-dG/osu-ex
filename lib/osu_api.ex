@@ -19,6 +19,7 @@ defmodule OsuAPI do
 
   * The response body of functions which return at most one result (`get_user/2`,
     `get_beatmap/2`, etc.) is a single map, instead of a list containing one map.
+    If no result is found, then the body is `nil`, rather than an empty list.
   * Numbers, booleans, and dates are parsed to their native types, and enums
     are converted to their values as atoms.
   * Enums whose names end in "_id" have the suffix removed, since the atoms aren't IDs.
@@ -61,6 +62,7 @@ defmodule OsuAPI do
   defp get_first(endpoint, params) when is_endpoint(endpoint) do
     case get(endpoint, params) do
       {:ok, %HTTPoison.Response{status_code: 200, body: [h | _t]} = r} -> {:ok, %{r | body: h}}
+      {:ok, %HTTPoison.Response{status_code: 200} = r} -> {:ok, %{r | body: nil}}
       {:ok, r} -> {:ok, r}
       {:error, e} -> {:error, e}
     end

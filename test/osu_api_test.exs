@@ -70,6 +70,16 @@ defmodule OsuAPITest do
     assert is_integer(f.max_combo)
   end
 
+  test "get_first sets body to nil if no search results" do
+    {:ok, r} = OsuAPI.get_user("_")
+    assert r.status_code === 200
+    assert is_nil(r.body)
+
+    r = OsuAPI.get_beatmap!(0)
+    assert r.status_code === 200
+    assert is_nil(r.body)
+  end
+
   test "get_beatmaps" do
     {:ok, r} = OsuAPI.get_beatmaps()
     assert r.status_code === 200
