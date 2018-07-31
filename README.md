@@ -43,7 +43,9 @@ To access the osu! API, you need to provide an API key.
 You can pass the `k` parameter around if you want,
 but otherwise you can configure its value in `config.exs`:
 
+```elixir
 config :osu_api, api_key: "<your key here>"
+```
 
 ## Custom/Advanced Requests
 
