@@ -47,6 +47,8 @@ but otherwise you can configure its value in `config.exs`:
 config :osu_api, api_key: "<your key here>"
 ```
 
+You can also set the `OSU_API_KEY` environment variable.
+
 ## Custom/Advanced Requests
 
 As previously mentioned, this module is built on top of `HTTPoison`, which

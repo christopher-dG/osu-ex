@@ -8,7 +8,7 @@ defmodule OsuAPI.HTTP do
   def process_url(url), do: "#{@base_url}/get_#{url}"
 
   def process_request_options(options) do
-    api_key = Application.get_env(:osu_api, :api_key)
+    api_key = Application.get_env(:osu_api, :api_key, System.get_env("OSU_API_KEY"))
     Keyword.update(options, :params, %{k: api_key}, &Map.put_new(&1, :k, api_key))
   end
 

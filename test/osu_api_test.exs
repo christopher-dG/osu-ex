@@ -2,10 +2,6 @@ defmodule OsuAPITest do
   use ExUnit.Case
   doctest OsuAPI
 
-  setup_all do
-    Application.put_env(:osu_api, :api_key, System.get_env("OSU_API_KEY"))
-  end
-
   test "response body value types are converted" do
     r = OsuAPI.get!(:user, u: "cookiezi")
     assert r.status_code === 200
