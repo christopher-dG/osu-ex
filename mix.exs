@@ -9,14 +9,7 @@ defmodule OsuAPI.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "osu! API",
-      source_url: "https://github.com/christopher-dG/osu-api-ex",
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.detail": :test,
-        "coveralls.post": :test,
-        "coveralls.html": :test
-      ]
+      source_url: "https://github.com/christopher-dG/osu-api-ex"
     ]
   end
 
@@ -24,8 +17,7 @@ defmodule OsuAPI.MixProject do
     [
       {:httpoison, "~> 1.1"},
       {:jason, "~> 1.1"},
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.9", only: :test}
+      {:ex_doc, "~> 0.18", only: :dev, runtime: false}
     ]
   end
 end
