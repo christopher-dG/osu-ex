@@ -1,6 +1,7 @@
 # OsuAPI
 
 [![Build Status](https://travis-ci.com/christopher-dG/osu-api-ex.svg?branch=master)](https://travis-ci.com/christopher-dG/osu-api-ex)
+[![Hex.pm](https://img.shields.io/hexpm/v/osu_api.svg)](https://hex.pm/packages/osu_api)
 
 **A wrapper around the osu! API.**
 
@@ -10,7 +11,7 @@ In your `mix.exs`:
 
 ```elixir
 defp deps do
-  [{:osu_api, git: "https://github.com/christopher-dG/osu-api-ex"}]
+  [{:osu_api, "~> 0.1"}]
 end
 ```
 

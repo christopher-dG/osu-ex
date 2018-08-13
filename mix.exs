@@ -8,16 +8,29 @@ defmodule OsuAPI.MixProject do
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      package: package(),
       name: "osu! API",
-      source_url: "https://github.com/christopher-dG/osu-api-ex"
+      description: "A wrapper around the osu! API.",
+      source_url: "https://github.com/christopher-dG/osu-api-ex",
+      homepage_url: "https://github.com/christopher-dG/osu-api-ex"
     ]
   end
 
   defp deps do
     [
-      {:httpoison, "~> 1.1"},
+      {:httpoison, "~> 1.2"},
       {:jason, "~> 1.1"},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false}
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/christopher-dG/osu-api-ex",
+        "osu! API Documentation" => "https://github.com/ppy/osu-api/wiki"
+      }
     ]
   end
 end
