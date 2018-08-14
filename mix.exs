@@ -5,7 +5,7 @@ defmodule OsuAPI.MixProject do
     [
       app: :osu_api,
       version: "0.1.0",
-      elixir: "~> 1.6",
+      elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
@@ -20,7 +20,7 @@ defmodule OsuAPI.MixProject do
     [
       {:httpoison, "~> 1.2"},
       {:jason, "~> 1.1"},
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
   end
 
