@@ -1,5 +1,8 @@
 # osu! Replay Parser
 
+[![Build Status](https://travis-ci.com/christopher-dG/osu-replay-parser-ex.svg?branch=master)](https://travis-ci.com/christopher-dG/osu-replay-parser-ex)
+[![Hex.pm](https://img.shields.io/hexpm/v/osu_replay_parser.svg)](https://hex.pm/packages/osu_replay_parser)
+
 A parser for [osu!](https://osu.ppy.sh) replays (.osr files) written in Elixir.
 
 ## Usage
@@ -36,7 +39,7 @@ iex> OsuReplayParser.parse!("test/data/cookiezi-fd4d.osr")
 Or by passing the file contents directly:
 
 ```elixir
-iex> "test/data/cookiezi-fd4d.osr" |> File.read!() |> OsuReplayparser.parse!()
+iex> "test/data/cookiezi-fd4d.osr" |> File.read!() |> OsuReplayParser.parse!()
 # The same result.
 ```
 
