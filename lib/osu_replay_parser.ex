@@ -3,10 +3,12 @@ defmodule OsuReplayParser do
 
   use Bitwise, only_operators: true
 
-  @doc "Parse the .osr file at `path`."
+  @doc "Parse a replay file. The argument can be either the file path or the contents."
   @spec parse!(binary) :: map
-  def parse!(path) when is_binary(path) do
-    %{data_: File.read!(path), temp_: nil}
+  def parse!(path_or_data) when is_binary(path_or_data) do
+    data = if(String.valid?(path_or_data), do: File.read!(path_or_data), else: path_or_data)
+
+    %{data_: data, temp_: nil}
     |> read_byte(:mode)
     |> read_int(:version)
     |> read_string(:beatmap_md5)

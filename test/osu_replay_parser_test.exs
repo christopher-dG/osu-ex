@@ -2,8 +2,17 @@ defmodule OsuReplayParserTest do
   use ExUnit.Case
   doctest OsuReplayParser
 
-  test "parse!/1" do
-    d = OsuReplayParser.parse!("test/data/cookiezi-fd4d.osr")
+  @testfile "test/data/cookiezi-fd4d.osr"
+
+  test "parse!/1 (file path)" do
+    @testfile |> OsuReplayParser.parse!() |> assert()
+  end
+
+  test "parse!/1 (file contents)" do
+    @testfile |> OsuReplayParser.parse!() |> assert()
+  end
+
+  defp asserts(d) do
     assert d.beatmap_md5 === "da8aae79c8f3306b5d65ec951874a7fb"
     assert d.combo === 2385
     assert d.life_bar === ""
