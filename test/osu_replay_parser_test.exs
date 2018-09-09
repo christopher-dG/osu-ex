@@ -4,12 +4,22 @@ defmodule OsuReplayParserTest do
 
   @testfile "test/data/cookiezi-fd4d.osr"
 
+  test "parse/1 (file path)" do
+    {:ok, d} = OsuReplayParser.parse(@testfile)
+    asserts(d)
+  end
+
+  test "parse/1 (file contents)" do
+    {:ok, d} = @testfile |> File.read!() |> OsuReplayParser.parse()
+    asserts(d)
+  end
+
   test "parse!/1 (file path)" do
     @testfile |> OsuReplayParser.parse!() |> assert()
   end
 
   test "parse!/1 (file contents)" do
-    @testfile |> OsuReplayParser.parse!() |> assert()
+    @testfile |> File.read!() |> OsuReplayParser.parse!() |> assert()
   end
 
   defp asserts(d) do

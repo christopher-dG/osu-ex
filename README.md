@@ -7,10 +7,10 @@ A parser for [osu!](https://osu.ppy.sh) replays (.osr files) written in Elixir.
 
 ## Usage
 
-Parse a replay by passing the file path:
+Parse a replay by passing the file path or contents.
 
 ```elixir
-iex> OsuReplayParser.parse!("test/data/cookiezi-fd4d.osr")
+iex> {:ok, r} = OsuReplayParser.parse("test/data/cookiezi-fd4d.osr"); r
 %{
   beatmap_md5: "da8aae79c8f3306b5d65ec951874a7fb",
   combo: 2385,
@@ -34,13 +34,8 @@ iex> OsuReplayParser.parse!("test/data/cookiezi-fd4d.osr")
   timestamp: 635873755112646784,
   version: 20151228
 }
-```
 
-Or by passing the file contents directly:
-
-```elixir
-iex> "test/data/cookiezi-fd4d.osr" |> File.read!() |> OsuReplayParser.parse!()
-# The same result.
+{:ok, ^r} = "test/data/cookiezi-fd4d.osr" |> File.read!() |> OsuReplayParser.parse()
 ```
 
 More details on the file format can be found [here](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)).

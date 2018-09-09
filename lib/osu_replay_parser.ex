@@ -4,6 +4,16 @@ defmodule OsuReplayParser do
   use Bitwise, only_operators: true
 
   @doc "Parse a replay file. The argument can be either the file path or the contents."
+  @spec parse(binary) :: {:ok, map} | {:error, term}
+  def parse(path_or_data) when is_binary(path_or_data) do
+    try do
+      {:ok, parse!(path_or_data)}
+    rescue
+      e -> {:error, e}
+    end
+  end
+
+  @doc "Parse a replay file. The argument can be either the file path or the contents."
   @spec parse!(binary) :: map
   def parse!(path_or_data) when is_binary(path_or_data) do
     data = if(String.valid?(path_or_data), do: File.read!(path_or_data), else: path_or_data)
