@@ -195,4 +195,19 @@ defmodule OsuAPI do
              is_list(opts) do
     get!("replay", Keyword.merge(opts, b: map_id, m: mode, u: user))
   end
+
+  @doc "Translates the game mode enum to an atom and vice versa."
+  def mode(_m)
+
+  @spec mode(integer) :: atom
+  def mode(0), do: :standard
+  def mode(1), do: :taiko
+  def mode(2), do: :catch
+  def mode(3), do: :mania
+
+  @spec mode(atom) :: integer
+  def mode(:standard), do: 0
+  def mode(:taiko), do: 1
+  def mode(:catch), do: 2
+  def mode(:mania), do: 3
 end

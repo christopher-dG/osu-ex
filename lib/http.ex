@@ -17,7 +17,7 @@ defmodule OsuAPI.HTTP do
         # If the request has a user parameter, infer the type.
         params =
           case Map.fetch(params, :u) do
-            {:ok, u} -> Map.put(params, :type, if(is_integer(u), do: "id", else: "string"))
+            {:ok, u} -> Map.put_new(params, :type, if(is_integer(u), do: "id", else: "string"))
             :error -> params
           end
 

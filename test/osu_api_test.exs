@@ -219,4 +219,16 @@ defmodule OsuAPITest do
     assert is_binary(replay.content)
     assert replay.encoding === "base64"
   end
+
+  test "mode" do
+    assert OsuAPI.mode(0) === :standard
+    assert OsuAPI.mode(1) === :taiko
+    assert OsuAPI.mode(2) === :catch
+    assert OsuAPI.mode(3) === :mania
+
+    assert OsuAPI.mode(:standard) === 0
+    assert OsuAPI.mode(:taiko) === 1
+    assert OsuAPI.mode(:catch) === 2
+    assert OsuAPI.mode(:mania) === 3
+  end
 end
