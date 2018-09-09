@@ -22,5 +22,8 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 osu_replay_parser-*.tar
 
+# No need to keep dependencies locked.
+mix.lock
+
 # Ignore test replay files.
 *.osr
