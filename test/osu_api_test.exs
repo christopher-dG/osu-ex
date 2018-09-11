@@ -1,8 +1,10 @@
 defmodule OsuAPITest do
   use ExUnit.Case
 
+  @moduletag :net
+
   test "response body value types are converted" do
-    user = OsuAPI.get_user!("cookiezi")
+    assert user = OsuAPI.get_user!("cookiezi")
 
     assert is_map(user)
     assert is_number(Map.get(user, :accuracy))
@@ -27,12 +29,11 @@ defmodule OsuAPITest do
     assert is_integer(Map.get(user, :user_id))
     assert is_binary(Map.get(user, :username))
 
-    beatmap = OsuAPI.get_beatmap!(129_891)
+    assert beatmap = OsuAPI.get_beatmap!(129_891)
 
     assert is_map(beatmap)
-    assert is_atom(Map.get(beatmap, :approved))
-    # DateTimes are structs, and structs are maps.
-    assert is_map(Map.get(beatmap, :approved_date))
+    assert is_integer(Map.get(beatmap, :approved))
+    assert %DateTime{} = Map.get(beatmap, :approved_date)
     assert is_map(Map.get(beatmap, :last_update))
     assert is_binary(Map.get(beatmap, :artist))
     assert is_integer(Map.get(beatmap, :beatmap_id))
@@ -46,13 +47,13 @@ defmodule OsuAPITest do
     assert is_number(Map.get(beatmap, :diff_drain))
     assert is_integer(Map.get(beatmap, :hit_length))
     assert is_binary(Map.get(beatmap, :source))
-    assert is_atom(Map.get(beatmap, :genre))
-    assert is_atom(Map.get(beatmap, :language))
+    assert is_integer(Map.get(beatmap, :genre_id))
+    assert is_integer(Map.get(beatmap, :language_id))
     assert is_binary(Map.get(beatmap, :title))
     assert is_integer(Map.get(beatmap, :total_length))
     assert is_binary(Map.get(beatmap, :version))
     assert is_binary(Map.get(beatmap, :file_md5))
-    assert is_atom(Map.get(beatmap, :mode))
+    assert is_integer(Map.get(beatmap, :mode))
     assert is_list(Map.get(beatmap, :tags))
     assert is_integer(Map.get(beatmap, :favourite_count))
     assert is_integer(Map.get(beatmap, :playcount))
@@ -66,71 +67,71 @@ defmodule OsuAPITest do
   end
 
   test "get_beatmaps" do
-    {:ok, beatmaps} = OsuAPI.get_beatmaps()
+    assert {:ok, beatmaps} = OsuAPI.get_beatmaps()
     assert is_list(beatmaps)
     assert length(beatmaps) === 500
     assert Enum.all?(beatmaps, fn b -> Map.has_key?(b, :beatmap_id) end)
 
-    beatmaps = OsuAPI.get_beatmaps!()
+    assert beatmaps = OsuAPI.get_beatmaps!()
     assert is_list(beatmaps)
     assert length(beatmaps) === 500
     assert Enum.all?(beatmaps, fn b -> Map.has_key?(b, :beatmap_id) end)
   end
 
   test "get_beatmap" do
-    {:ok, beatmap} = OsuAPI.get_beatmap(129_891)
+	assert {:ok, beatmap} = OsuAPI.get_beatmap(129_891)
     assert is_map(beatmap)
     assert Map.get(beatmap, :beatmap_id) === 129_891
 
-    beatmap = OsuAPI.get_beatmap!(129_891)
+    assert beatmap = OsuAPI.get_beatmap!(129_891)
     assert is_map(beatmap)
     assert Map.get(beatmap, :beatmap_id) === 129_891
   end
 
   test "get_beatmapset" do
-    {:ok, beatmapset} = OsuAPI.get_beatmapset(39804)
+    assert {:ok, beatmapset} = OsuAPI.get_beatmapset(39804)
     assert is_list(beatmapset)
     assert length(beatmapset) === 5
     assert Enum.all?(beatmapset, fn b -> Map.get(b, :beatmapset_id) === 39804 end)
 
-    beatmapset = OsuAPI.get_beatmapset!(39804)
+    assert beatmapset = OsuAPI.get_beatmapset!(39804)
     assert is_list(beatmapset)
     assert length(beatmapset) === 5
     assert Enum.all?(beatmapset, fn b -> Map.get(b, :beatmapset_id) === 39804 end)
   end
 
   test "get_user" do
-    {:ok, user} = OsuAPI.get_user("cookiezi")
+    assert {:ok, user} = OsuAPI.get_user("cookiezi")
     assert is_map(user)
     assert Map.get(user, :user_id) === 124_493
 
-    {:ok, user} = OsuAPI.get_user(124_493)
+    assert {:ok, user} = OsuAPI.get_user(124_493)
     assert is_map(user)
     assert Map.get(user, :user_id) === 124_493
 
-    user = OsuAPI.get_user!("cookiezi")
+    assert user = OsuAPI.get_user!("cookiezi")
     assert is_map(user)
     assert Map.get(user, :user_id) === 124_493
 
-    user = OsuAPI.get_user!(124_493)
+    assert user = OsuAPI.get_user!(124_493)
     assert is_map(user)
     assert Map.get(user, :user_id) === 124_493
   end
 
   test "get_scores" do
-    {:ok, scores} = OsuAPI.get_scores(129_891)
+    assert {:ok, scores} = OsuAPI.get_scores(129_891)
     assert is_list(scores)
     assert length(scores) === 50
     assert Enum.all?(scores, fn s -> Map.has_key?(s, :score_id) end)
 
-    scores = OsuAPI.get_scores!(129_891)
+    assert scores = OsuAPI.get_scores!(129_891)
     assert is_list(scores)
     assert length(scores) === 50
     assert Enum.all?(scores, fn s -> Map.has_key?(s, :score_id) end)
   end
 
   test "get_user_best" do
-    {:ok, user_best} = OsuAPI.get_user_best("cookiezi")
+    assert {:ok, user_best} = OsuAPI.get_user_best("cookiezi")
     assert is_list(user_best)
     assert length(user_best) === 10
 
@@ -138,7 +139,7 @@ defmodule OsuAPITest do
              Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
            end)
 
-    {:ok, user_best} = OsuAPI.get_user_best(124_493)
+    assert {:ok, user_best} = OsuAPI.get_user_best(124_493)
     assert is_list(user_best)
     assert length(user_best) === 10
 
@@ -146,7 +147,7 @@ defmodule OsuAPITest do
              Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
            end)
 
-    user_best = OsuAPI.get_user_best!("cookiezi")
+    assert user_best = OsuAPI.get_user_best!("cookiezi")
     assert is_list(user_best)
     assert length(user_best) === 10
 
@@ -154,7 +155,7 @@ defmodule OsuAPITest do
              Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
            end)
 
-    user_best = OsuAPI.get_user_best!(124_493)
+    assert user_best = OsuAPI.get_user_best!(124_493)
     assert is_list(user_best)
     assert length(user_best) === 10
 
@@ -166,28 +167,28 @@ defmodule OsuAPITest do
   test "get_user_recent" do
     # We can't guarantee recent plays, so no length checks.
 
-    {:ok, user_recent} = OsuAPI.get_user_recent("cookiezi")
+    assert {:ok, user_recent} = OsuAPI.get_user_recent("cookiezi")
     assert is_list(user_recent)
 
     assert Enum.all?(user_recent, fn s ->
              Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
            end)
 
-    {:ok, user_recent} = OsuAPI.get_user_recent(124_493)
+    assert {:ok, user_recent} = OsuAPI.get_user_recent(124_493)
     assert is_list(user_recent)
 
     assert Enum.all?(user_recent, fn s ->
              Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
            end)
 
-    user_recent = OsuAPI.get_user_recent!("cookiezi")
+    assert user_recent = OsuAPI.get_user_recent!("cookiezi")
     assert is_list(user_recent)
 
     assert Enum.all?(user_recent, fn s ->
              Map.get(s, :user_id) === 124_493 and Map.has_key?(s, :score)
            end)
 
-    user_recent = OsuAPI.get_user_recent!(124_493)
+    assert user_recent = OsuAPI.get_user_recent!(124_493)
     assert is_list(user_recent)
 
     assert Enum.all?(user_recent, fn s ->
@@ -197,38 +198,27 @@ defmodule OsuAPITest do
 
   @tag skip: "can't find a match, response body doesn't follow API docs"
   test "get_match" do
-    {:ok, match} = OsuAPI.get_match(1_933_622)
+    assert {:ok, match} = OsuAPI.get_match(1_933_622)
     assert is_map(match)
     assert is_map(Map.get(match, :match))
     assert is_list(Map.get(match, :games))
 
-    match = OsuAPI.get_match!(1_933_622)
+    assert match = OsuAPI.get_match!(1_933_622)
     assert is_map(match)
     assert is_map(Map.get(match, :match))
     assert is_list(Map.get(match, :games))
   end
 
   test "get_replay" do
-    {:ok, replay} = OsuAPI.get_replay(129_891, "cookiezi", 0)
+    assert {:ok, replay} = OsuAPI.get_replay(129_891, "cookiezi", 0)
     assert is_map(replay)
     assert is_binary(replay.content)
     assert replay.encoding === "base64"
 
-    replay = OsuAPI.get_replay!(129_891, 124_493, 0)
+    assert replay = OsuAPI.get_replay!(129_891, 124_493, 0)
     assert is_map(replay)
     assert is_binary(replay.content)
     assert replay.encoding === "base64"
   end
 
-  test "mode" do
-    assert OsuAPI.mode(0) === :standard
-    assert OsuAPI.mode(1) === :taiko
-    assert OsuAPI.mode(2) === :catch
-    assert OsuAPI.mode(3) === :mania
-
-    assert OsuAPI.mode(:standard) === 0
-    assert OsuAPI.mode(:taiko) === 1
-    assert OsuAPI.mode(:catch) === 2
-    assert OsuAPI.mode(:mania) === 3
-  end
 end

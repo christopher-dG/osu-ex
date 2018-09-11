@@ -22,9 +22,10 @@ defmodule OsuAPI do
   * The return value of functions which return at most one result
     (`get_user/2` for example) is a map instead of a list containing one map.
     If no result is found, then the value is `nil`, instead of an empty list.
-  * Numbers, booleans, dates, and lists are parsed to their native types,
-    and enum values are converted to their symbolic values as atoms.
-  * Enums named `*_id` have the suffix removed, since the atoms aren't IDs.
+  * Numbers, booleans, dates, and lists are parsed to their native types.
+
+  To parse enum values like `approved: 3` into more human-readable atoms,
+  or encode/decode mods, see the `Utils` module.
 
   # Configuration
 
@@ -195,19 +196,4 @@ defmodule OsuAPI do
              is_list(opts) do
     get!("replay", Keyword.merge(opts, b: map_id, m: mode, u: user))
   end
-
-  @doc "Translates the game mode enum to an atom and vice versa."
-  def mode(_m)
-
-  @spec mode(integer) :: atom
-  def mode(0), do: :standard
-  def mode(1), do: :taiko
-  def mode(2), do: :catch
-  def mode(3), do: :mania
-
-  @spec mode(atom) :: integer
-  def mode(:standard), do: 0
-  def mode(:taiko), do: 1
-  def mode(:catch), do: 2
-  def mode(:mania), do: 3
 end

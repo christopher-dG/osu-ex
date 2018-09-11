@@ -1,4 +1,4 @@
-# OsuAPI
+# osu! API
 
 [![Build Status](https://travis-ci.com/christopher-dG/osu-api-ex.svg?branch=master)](https://travis-ci.com/christopher-dG/osu-api-ex)
 [![Hex.pm](https://img.shields.io/hexpm/v/osu_api.svg)](https://hex.pm/packages/osu_api)
@@ -34,7 +34,9 @@ except for the following:
   If no result is found, then the value is `nil`, instead of an empty list.
 * Numbers, booleans, dates, and lists are parsed to their native types,
   and enum values are converted to their symbolic values as atoms.
-* Enums named `*_id` have the suffix removed, since the atoms aren't IDs.
+
+To parse enum values like `approved: 3` into more human-readable atoms,
+or encode/decode mods, see the `OsuAPI.Utils` module.
 
 ## Configuration
 
