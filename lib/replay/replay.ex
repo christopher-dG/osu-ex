@@ -1,5 +1,5 @@
-defmodule OsuReplayParser do
-  @moduledoc "A parser for osu! replays (.osr files)."
+defmodule OsuEx.Replay do
+  @moduledoc "A parser for .osr replay files. See `parse/1` for usage."
 
   use Bitwise, only_operators: true
 

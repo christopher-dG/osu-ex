@@ -20,10 +20,13 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-osu_replay_parser-*.tar
+osu_ex-*.tar
 
-# No need to keep dependencies locked.
-mix.lock
+# Library projects should not commit mix.lock.
+/mix.lock
 
 # Ignore test replay files.
 *.osr
+
+# No need to share configuration.
+/config/config.exs

@@ -1,25 +1,28 @@
 defmodule OsuReplayParserTest do
   use ExUnit.Case
-  doctest OsuReplayParser
+
+  alias OsuEx.Replay
+
+  doctest Replay
 
   @testfile "test/data/cookiezi-fd4d.osr"
 
   test "parse/1 (file path)" do
-    {:ok, d} = OsuReplayParser.parse(@testfile)
+    {:ok, d} = Replay.parse(@testfile)
     asserts(d)
   end
 
   test "parse/1 (file contents)" do
-    {:ok, d} = @testfile |> File.read!() |> OsuReplayParser.parse()
+    {:ok, d} = @testfile |> File.read!() |> Replay.parse()
     asserts(d)
   end
 
   test "parse!/1 (file path)" do
-    @testfile |> OsuReplayParser.parse!() |> assert()
+    @testfile |> Replay.parse!() |> asserts()
   end
 
   test "parse!/1 (file contents)" do
-    @testfile |> File.read!() |> OsuReplayParser.parse!() |> assert()
+    @testfile |> File.read!() |> Replay.parse!() |> asserts()
   end
 
   defp asserts(d) do

@@ -1,16 +1,71 @@
-# osu! Replay Parser
+# osu!ex
 
-[![Build Status](https://travis-ci.com/christopher-dG/osu-replay-parser-ex.svg?branch=master)](https://travis-ci.com/christopher-dG/osu-replay-parser-ex)
-[![Hex.pm](https://img.shields.io/hexpm/v/osu_replay_parser.svg)](https://hex.pm/packages/osu_replay_parser)
+[![Build Status](https://travis-ci.com/christopher-dG/osuex.svg?branch=master)](https://travis-ci.com/christopher-dG/osuex)
+[![Hex.pm](https://img.shields.io/hexpm/v/osuex.svg)](https://hex.pm/packages/osuex)
 
-A parser for [osu!](https://osu.ppy.sh) replays (.osr files) written in Elixir.
+**[osu!](https://osu.ppy.sh) tools for Elixir.**
 
-## Usage
+osu!ex provides the following (so far):
 
-Parse a replay by passing the file path or contents.
+* API client (`OsuEx.API`)
+* Replay file parser (`OsuEx.Replay`)
+
+## Installation
+
+In your `mix.exs`:
 
 ```elixir
-iex> {:ok, r} = OsuReplayParser.parse("test/data/cookiezi-fd4d.osr"); r
+defp deps do
+  [{:osu_ex, "~> 0.1"}]
+end
+```
+
+## `OsuEx.API`
+
+**A wrapper around the osu! API.**
+
+### Usage
+
+```elixir
+iex> OsuEx.API.get_user("cookiezi", event_days: 5)
+{:ok, %{user_id: 124493, username: "Cookiezi", ...}}
+```
+
+The `get_*` function names mirror the API itself as do the parameter names,
+which can be passed as a trailing keyword list.
+
+The returned data is mostly identical to the osu! API documentation,
+except for the following:
+
+* The return value of functions which return at most one result
+  (`get_user/2` for example) is a map instead of a list containing one map.
+  If no result is found, then the value is `nil`, instead of an empty list.
+* Numbers, booleans, dates, and lists are parsed to their native types,
+  and enum values are converted to their symbolic values as atoms.
+
+To parse enum values like `approved: 3` into more human-readable atoms,
+or encode/decode mods, see the `OsuAPI.Utils` module.
+
+### Configuration
+
+To access the osu! API, you need to provide an API key.
+You can pass the `k` parameter around if you want,
+but otherwise you can configure its value in `config.exs`:
+
+    config :osu_ex, api_key: "<your key here>"
+
+You can also set the `OSU_API_KEY` environment variable.
+
+## `OsuEx.Replay`
+
+**A parser for .osr replay files.**
+
+### Usage
+
+Parse a replay by passing the file path or contents to `OsuEx.Replay.parse/1`.
+
+```elixir
+iex> {:ok, r} = OsuEx.Replay.parse("test/data/cookiezi-fd4d.osr"); r
 %{
   beatmap_md5: "da8aae79c8f3306b5d65ec951874a7fb",
   combo: 2385,
@@ -40,4 +95,4 @@ iex> {:ok, r} = OsuReplayParser.parse("test/data/cookiezi-fd4d.osr"); r
 
 More details on the file format can be found [here](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)).
 
-Note that this library does not decode the LZMA-encoded replay data.
+Note that this module does not decode the LZMA-encoded replay data.

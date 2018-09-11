@@ -1,23 +1,25 @@
-defmodule OsuReplayParser.MixProject do
+defmodule OsuEx.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :osu_replay_parser,
-      version: "0.1.2",
+      app: :osu_ex,
+      version: "0.1.0",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
-      name: "osu! Replay Parser",
-      description: "A parser for osu replays (.osr files).",
-      source_url: "https://github.com/christopher-dG/osu-replay-parser-ex",
-      homepage_url: "https://github.com/christopher-dG/osu-replay-parser-ex"
+      name: "osu!ex",
+      description: "osu! tools for Elixir.",
+      source_url: "https://github.com/christopher-dG/osu-ex",
+      homepage_url: "https://github.com/christopher-dG/osu-ex"
     ]
   end
 
   defp deps do
     [
+      {:httpoison, "~> 1.3"},
+      {:jason, "~> 1.1"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
   end
@@ -26,9 +28,10 @@ defmodule OsuReplayParser.MixProject do
     [
       licenses: ["MIT"],
       links: %{
-        GitHub: "https://github.com/christopher-dG/osu-replay-parser-ex",
-        "File Format Documentation":
-          "https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format"
+        "GitHub" => "https://github.com/christopher-dG/osu-ex",
+        "osu! API Documentation" => "https://github.com/ppy/osu-api/wiki",
+        "Replay File Format Documentation" =>
+          "https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)"
       }
     ]
   end
