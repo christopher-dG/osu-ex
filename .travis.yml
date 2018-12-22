@@ -1,0 +1,6 @@
+language: elixir
+elixir: 1.7
+notifications: {email: false}
+script:
+  - mix test --cover
+  - mix format --check-formatted
