@@ -118,14 +118,16 @@ defmodule OsuEx.API do
 
   @doc "Gets a beatmap by ID (beatmap ID, not beatmapset ID) or MD5."
   @spec get_beatmap(integer | binary, keyword) :: {:ok, map | nil} | {:error, Error.t()}
-  def get_beatmap(id_or_md5, opts \\ []) when is_integer(id_or_md5) or is_binary(id_or_md5) and is_list(opts) do
+  def get_beatmap(id_or_md5, opts \\ [])
+      when is_integer(id_or_md5) or (is_binary(id_or_md5) and is_list(opts)) do
     k = if(is_integer(id_or_md5), do: :b, else: :h)
     get_first("beatmaps", Keyword.put(opts, k, id_or_md5))
   end
 
   @doc "Same as `get_beatmap/2` but raises exceptions."
   @spec get_beatmap!(integer | binary, keyword) :: map | nil
-  def get_beatmap!(id_or_md5, opts \\ []) when is_integer(id_or_md5) or is_binary(id_or_md5) and is_list(opts) do
+  def get_beatmap!(id_or_md5, opts \\ [])
+      when is_integer(id_or_md5) or (is_binary(id_or_md5) and is_list(opts)) do
     k = if(is_integer(id_or_md5), do: :b, else: :h)
     get_first!("beatmaps", Keyword.put(opts, k, id_or_md5))
   end
