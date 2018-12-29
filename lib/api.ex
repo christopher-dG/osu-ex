@@ -1,6 +1,6 @@
 defmodule OsuEx.API.Error do
   defexception reason: nil, value: nil
-  @type t :: {:status_code | integer} | {:httpoison | HTTPoison.Error.t()}
+  @type t :: {:error, {:status_code | pos_integer} | {:httpoison | HTTPoison.Error.t()}}
   def message(e), do: inspect(e)
 end
 
@@ -63,10 +63,12 @@ defmodule OsuEx.API do
   alias OsuEx.API.Error
   alias OsuEx.API.HTTP
 
-  @type user :: binary | integer
+  @type user_id :: pos_integer | String.t()
+  @type beatmap_id :: pos_integer | binary
+  @type mode :: 0..3
 
-  @spec get(binary, keyword) :: {:ok, [map]} | {:error, Error.t()}
-  defp get(endpoint, params) when is_binary(endpoint) and is_list(params) do
+  @spec get(String.t(), keyword) :: {:ok, [map]} | Error.t()
+  defp get(endpoint, params) do
     case HTTP.get(endpoint, [], params: Map.new(params)) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, body}
@@ -79,16 +81,16 @@ defmodule OsuEx.API do
     end
   end
 
-  @spec get!(binary, keyword) :: [map]
-  defp get!(endpoint, params) when is_binary(endpoint) and is_list(params) do
+  @spec get!(String.t(), keyword) :: [map]
+  defp get!(endpoint, params) do
     case get(endpoint, params) do
       {:ok, body} -> body
       {:error, err} -> raise err
     end
   end
 
-  @spec get_first(binary, keyword) :: {:ok, map | nil} | {:error, Error.t()}
-  defp get_first(endpoint, params) when is_binary(endpoint) and is_list(params) do
+  @spec get_first(String.t(), keyword) :: {:ok, map | nil} | Error.t()
+  defp get_first(endpoint, params) do
     case get(endpoint, params) do
       {:ok, [h | _t]} -> {:ok, h}
       {:ok, []} -> {:ok, nil}
@@ -96,8 +98,8 @@ defmodule OsuEx.API do
     end
   end
 
-  @spec get_first!(binary, keyword) :: map | nil
-  defp get_first!(endpoint, params) when is_binary(endpoint) and is_list(params) do
+  @spec get_first!(String.t(), keyword) :: map | nil
+  defp get_first!(endpoint, params) do
     case get_first(endpoint, params) do
       {:ok, body} -> body
       {:error, err} -> raise err
@@ -105,122 +107,112 @@ defmodule OsuEx.API do
   end
 
   @doc "Gets beatmaps."
-  @spec get_beatmaps(keyword) :: {:ok, [map]} | {:error, Error.t()}
-  def get_beatmaps(opts \\ []) when is_list(opts) do
+  @spec get_beatmaps(keyword) :: {:ok, [map]} | Error.t()
+  def get_beatmaps(opts \\ []) do
     get("beatmaps", opts)
   end
 
   @doc "Same as `get_beatmaps/2` but raises exceptions."
   @spec get_beatmaps!(keyword) :: [map]
-  def get_beatmaps!(opts \\ []) when is_list(opts) do
+  def get_beatmaps!(opts \\ []) do
     get!("beatmaps", opts)
   end
 
   @doc "Gets a beatmap by ID (beatmap ID, not beatmapset ID) or MD5."
-  @spec get_beatmap(integer | binary, keyword) :: {:ok, map | nil} | {:error, Error.t()}
-  def get_beatmap(id_or_md5, opts \\ [])
-      when is_integer(id_or_md5) or (is_binary(id_or_md5) and is_list(opts)) do
+  @spec get_beatmap(beatmap_id, keyword) :: {:ok, map | nil} | Error.t()
+  def get_beatmap(id_or_md5, opts \\ []) do
     k = if(is_integer(id_or_md5), do: :b, else: :h)
     get_first("beatmaps", Keyword.put(opts, k, id_or_md5))
   end
 
   @doc "Same as `get_beatmap/2` but raises exceptions."
-  @spec get_beatmap!(integer | binary, keyword) :: map | nil
-  def get_beatmap!(id_or_md5, opts \\ [])
-      when is_integer(id_or_md5) or (is_binary(id_or_md5) and is_list(opts)) do
+  @spec get_beatmap!(beatmap_id, keyword) :: map | nil
+  def get_beatmap!(id_or_md5, opts \\ []) do
     k = if(is_integer(id_or_md5), do: :b, else: :h)
     get_first!("beatmaps", Keyword.put(opts, k, id_or_md5))
   end
 
   @doc "Gets a beatmapset by ID (beatmapset ID, not beatmap ID)."
-  @spec get_beatmapset(integer, keyword) :: {:ok, [map]} | {:error, Error.t()}
-  def get_beatmapset(id, opts \\ []) when is_integer(id) and is_list(opts) do
+  @spec get_beatmapset(pos_integer, keyword) :: {:ok, [map]} | Error.t()
+  def get_beatmapset(id, opts \\ []) do
     get("beatmaps", Keyword.put(opts, :s, id))
   end
 
   @doc "Same as `get_beatmapset/2` but raises exceptions."
-  @spec get_beatmapset!(integer, keyword) :: [map]
-  def get_beatmapset!(id, opts \\ []) when is_integer(id) and is_list(opts) do
+  @spec get_beatmapset!(pos_integer, keyword) :: [map]
+  def get_beatmapset!(id, opts \\ []) do
     get!("beatmaps", Keyword.put(opts, :s, id))
   end
 
   @doc "Gets a user by username or user ID."
-  @spec get_user(user, keyword) :: {:ok, map | nil} | {:error, Error.t()}
-  def get_user(user, opts \\ []) when (is_binary(user) or is_integer(user)) and is_list(opts) do
+  @spec get_user(user_id, keyword) :: {:ok, map | nil} | Error.t()
+  def get_user(user, opts \\ []) do
     get_first("user", Keyword.put(opts, :u, user))
   end
 
   @doc "Same as `get_user/2` but raises exceptions."
-  @spec get_user!(user, keyword) :: map | nil
-  def get_user!(user, opts \\ []) when (is_binary(user) or is_integer(user)) and is_list(opts) do
+  @spec get_user!(user_id, keyword) :: map | nil
+  def get_user!(user, opts \\ []) do
     get_first!("user", Keyword.put(opts, :u, user))
   end
 
   @doc "Gets a beatmap's top scores."
-  @spec get_scores(integer, keyword) :: {:ok, [map]} | {:error, Error.t()}
-  def get_scores(map_id, opts \\ []) when is_integer(map_id) and is_list(opts) do
+  @spec get_scores(pos_integer, keyword) :: {:ok, [map]} | Error.t()
+  def get_scores(map_id, opts \\ []) do
     get("scores", Keyword.put(opts, :b, map_id))
   end
 
   @doc "Same as `get_scores/2` but raises exceptions."
-  @spec get_scores!(integer, keyword) :: [map]
-  def get_scores!(map_id, opts \\ []) when is_integer(map_id) and is_list(opts) do
+  @spec get_scores!(pos_integer, keyword) :: [map]
+  def get_scores!(map_id, opts \\ []) do
     get!("scores", Keyword.put(opts, :b, map_id))
   end
 
   @doc "Gets a user's top scores."
-  @spec get_user_best(user, keyword) :: {:ok, [map]} | {:error, Error.t()}
-  def get_user_best(user, opts \\ [])
-      when (is_binary(user) or is_integer(user)) and is_list(opts) do
+  @spec get_user_best(user_id, keyword) :: {:ok, [map]} | Error.t()
+  def get_user_best(user, opts \\ []) do
     get("user_best", Keyword.put(opts, :u, user))
   end
 
   @doc "Same as `get_user_best/2` but raises exceptions."
-  @spec get_user_best!(user, keyword) :: [map]
-  def get_user_best!(user, opts \\ [])
-      when (is_binary(user) or is_integer(user)) and is_list(opts) do
+  @spec get_user_best!(user_id, keyword) :: [map]
+  def get_user_best!(user, opts \\ []) do
     get!("user_best", Keyword.put(opts, :u, user))
   end
 
   @doc "Gets a user's recent scores."
-  @spec get_user_recent(user, keyword) :: {:ok, [map]} | {:error, Error.t()}
-  def get_user_recent(user, opts \\ [])
-      when (is_binary(user) or is_integer(user)) and is_list(opts) do
+  @spec get_user_recent(user_id, keyword) :: {:ok, [map]} | Error.t()
+  def get_user_recent(user, opts \\ []) do
     get("user_recent", Keyword.put(opts, :u, user))
   end
 
   @doc "Same as `get_user_recent/2` but raises exceptions."
-  @spec get_user_recent!(user, keyword) :: [map]
-  def get_user_recent!(user, opts \\ [])
-      when (is_binary(user) or is_integer(user)) and is_list(opts) do
+  @spec get_user_recent!(user_id, keyword) :: [map]
+  def get_user_recent!(user, opts \\ []) do
     get!("user_recent", Keyword.put(opts, :u, user))
   end
 
   @doc "Gets a multiplayer match by ID."
-  @spec get_match(integer, keyword) :: {:ok, map | nil} | {:error, Error.t()}
-  def get_match(id, opts \\ []) when is_integer(id) and is_list(opts) do
+  @spec get_match(pos_integer, keyword) :: {:ok, map | nil} | Error.t()
+  def get_match(id, opts \\ []) do
     get_first("match", Keyword.put(opts, :mp, id))
   end
 
   @doc "Same as `get_match/2` but raises exceptions."
-  @spec get_match!(integer, keyword) :: map | nil
-  def get_match!(id, opts \\ []) when is_integer(id) and is_list(opts) do
+  @spec get_match!(pos_integer, keyword) :: map | nil
+  def get_match!(id, opts \\ []) do
     get_first!("match", Keyword.put(opts, :mp, id))
   end
 
   @doc "Gets replay data for a score."
-  @spec get_replay(integer, user, integer, keyword) :: {:ok, map | nil} | {:error, Error.t()}
-  def get_replay(map_id, user, mode, opts \\ [])
-      when is_integer(map_id) and (is_binary(user) or is_integer(user)) and is_integer(mode) and
-             is_list(opts) do
+  @spec get_replay(pos_integer, user_id, mode, keyword) :: {:ok, map | nil} | Error.t()
+  def get_replay(map_id, user, mode, opts \\ []) do
     get("replay", Keyword.merge(opts, b: map_id, m: mode, u: user))
   end
 
   @doc "Same as `get_replay/4` but raises exceptions."
-  @spec get_replay!(integer, user, integer, keyword) :: map | nil
-  def get_replay!(map_id, user, mode, opts \\ [])
-      when is_integer(map_id) and (is_binary(user) or is_integer(user)) and is_integer(mode) and
-             is_list(opts) do
+  @spec get_replay!(pos_integer, user_id, mode, keyword) :: map | nil
+  def get_replay!(map_id, user, mode, opts \\ []) do
     get!("replay", Keyword.merge(opts, b: map_id, m: mode, u: user))
   end
 end

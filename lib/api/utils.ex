@@ -72,7 +72,7 @@ defmodule OsuEx.API.Utils do
   """
   def genre(_g)
 
-  @spec genre(0..10) :: atom
+  @spec genre(0..7 | 9..10) :: atom
   def genre(0), do: :any
   def genre(1), do: :unspecified
   def genre(2), do: :video_game
@@ -84,7 +84,7 @@ defmodule OsuEx.API.Utils do
   def genre(9), do: :hip_hop
   def genre(10), do: :electronic
 
-  @spec genre(atom) :: 0..10
+  @spec genre(atom) :: 0..7 | 9..10
   def genre(:any), do: 0
   def genre(:unspecified), do: 1
   def genre(:video_game), do: 2
@@ -245,7 +245,6 @@ defmodule OsuEx.API.Utils do
               |> Enum.with_index()
               |> Enum.map(fn {m, i} -> {m, round(:math.pow(2, i))} end)
               |> Enum.into(%{})
-  @max_mod 2_147_483_647
 
   @doc """
   Translates bitwise mods into a list of atoms and vice versa.
@@ -264,7 +263,7 @@ defmodule OsuEx.API.Utils do
   def mods(_m)
 
   @spec mods(0..2_147_483_647) :: {:ok, MapSet.t()}
-  def mods(n) when is_integer(n) and n >= 0 and n <= @max_mod do
+  def mods(n) when is_integer(n) do
     l =
       Enum.reduce(@mod_to_num, [], fn {m, i}, acc ->
         if((i &&& n) === i, do: acc ++ [m], else: acc)
