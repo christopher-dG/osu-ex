@@ -1,122 +1,14 @@
 defmodule OsuEx.Parser do
-  @moduledoc "Parsers for .db and .osr files."
+  @moduledoc false
 
   use Bitwise, only_operators: true
 
-  @doc "Parse a replay file. The argument can be either the file path or the contents."
-  @spec osr(binary) :: {:ok, map} | {:error, Exception.t()}
-  def osr(path_or_data) when is_binary(path_or_data) do
-    try do
-      {:ok, osr!(path_or_data)}
-    rescue
-      e -> {:error, e}
-    end
-  end
-
-  @doc "Same as `osr/1`, but raises exceptions."
-  @spec osr!(binary) :: map
-  def osr!(path_or_data) when is_binary(path_or_data) do
-    data = if(String.valid?(path_or_data), do: File.read!(path_or_data), else: path_or_data)
-
-    %{data_: data}
-    |> byte(:mode)
-    |> int(:version)
-    |> string(:beatmap_md5)
-    |> string(:player)
-    |> string(:replay_md5)
-    |> short(:n300)
-    |> short(:n100)
-    |> short(:n50)
-    |> short(:ngeki)
-    |> short(:nkatu)
-    |> short(:nmiss)
-    |> int(:score)
-    |> short(:combo)
-    |> bool(:perfect?)
-    |> int(:mods)
-    |> string(:life_bar)
-    |> datetime(:timestamp)
-    |> bytes(:replay_data)
-    |> long(:replay_id)
-    |> Map.delete(:data_)
-  end
-
-  @doc "Parse an osu!.db file. The argument can be either the file path or the contents."
-  @spec osu_db(binary) :: {:ok, map} | {:error, Exception.t()}
-  def osu_db(path_or_data) when is_binary(path_or_data) do
-    try do
-      {:ok, osu_db!(path_or_data)}
-    rescue
-      e -> {:error, e}
-    end
-  end
-
-  @doc "Same as `osu_db/1`, but raises exceptions."
-  @spec osu_db!(binary) :: map
-  def osu_db!(path_or_data) when is_binary(path_or_data) do
-    data = if(String.valid?(path_or_data), do: File.read!(path_or_data), else: path_or_data)
-
-    %{data_: data}
-    |> int(:version)
-    |> int(:nfolders)
-    |> bool(:account_unlocked)
-    |> datetime(:unlock_date)
-    |> string(:player)
-    |> multiple(:beatmaps, &beatmap/1)
-    |> int(:unknown)
-    |> Map.delete(:data_)
-  end
-
-  @doc "Parse a collection.db file. The argument can be either the file path or the contents."
-  @spec collection_db(binary) :: {:ok, map} | {:error, Exception.t()}
-  def collection_db(path_or_data) when is_binary(path_or_data) do
-    try do
-      {:ok, collection_db!(path_or_data)}
-    rescue
-      e -> {:error, e}
-    end
-  end
-
-  @doc "Same as `collection_db/1`, but raises exceptions."
-  @spec collection_db!(binary) :: map
-  def collection_db!(path_or_data) when is_binary(path_or_data) do
-    data = if(String.valid?(path_or_data), do: File.read!(path_or_data), else: path_or_data)
-
-    %{data_: data}
-    |> int(:version)
-    |> multiple(:collections, &collection/1)
-    |> Map.delete(:data_)
-  end
-
-  @doc "Parse a scores.db file. The argument can be either the file path or the contents."
-  @spec scores_db(binary) :: {:ok, map} | {:error, Exception.t()}
-  def scores_db(path_or_data) when is_binary(path_or_data) do
-    try do
-      {:ok, scores_db!(path_or_data)}
-    rescue
-      e -> {:error, e}
-    end
-  end
-
-  @doc "Same as `scores_db/1`, but raises exceptions."
-  @spec scores_db!(binary) :: map
-  def scores_db!(path_or_data) when is_binary(path_or_data) do
-    data = if(String.valid?(path_or_data), do: File.read!(path_or_data), else: path_or_data)
-
-    %{data_: data}
-    |> int(:version)
-    |> multiple(:beatmaps, &beatmap_scores/1)
-    |> Map.delete(:data_)
-  end
-
-  # Helper functions
-
   @spec put_or_return(map, atom | nil, term) :: map | {map, term}
-  defp put_or_return(m, k, v), do: if(is_nil(k), do: {m, v}, else: Map.put(m, k, v))
+  def put_or_return(m, k, v), do: if(is_nil(k), do: {m, v}, else: Map.put(m, k, v))
 
   # Read multiple items from the binary and optionally store it as k's value.
   @spec multiple(map, atom | nil) :: map | {map, [binary]}
-  defp multiple(m, k \\ nil, f, into \\ []) do
+  def multiple(m, k \\ nil, f, into \\ []) do
     {m, n} = int(m)
 
     {m, xs} =
@@ -133,7 +25,7 @@ defmodule OsuEx.Parser do
   end
 
   @spec int_n(map, atom | nil, integer) :: map | {map, integer}
-  defp int_n(m, k, n) do
+  def int_n(m, k, n) do
     s = n * 8
     <<v::little-size(s), t::binary>> = m.data_
     m = %{m | data_: t}
@@ -141,7 +33,7 @@ defmodule OsuEx.Parser do
   end
 
   @spec float_n(map, atom | nil, integer) :: map | {map, integer}
-  defp float_n(m, k, n) do
+  def float_n(m, k, n) do
     s = n * 8
     <<v::float-little-size(s), t::binary>> = m.data_
     m = %{m | data_: t}
@@ -149,31 +41,31 @@ defmodule OsuEx.Parser do
   end
 
   @spec byte(map, atom | nil) :: map | {map, byte}
-  defp byte(m, k \\ nil), do: int_n(m, k, 1)
+  def byte(m, k \\ nil), do: int_n(m, k, 1)
 
   @spec short(map, atom | nil) :: map | {map, integer}
-  defp short(m, k \\ nil), do: int_n(m, k, 2)
+  def short(m, k \\ nil), do: int_n(m, k, 2)
 
   @spec int(map, atom | nil) :: map | {map, integer}
-  defp int(m, k \\ nil), do: int_n(m, k, 4)
+  def int(m, k \\ nil), do: int_n(m, k, 4)
 
   @spec long(map, atom | nil) :: map | {map, integer}
-  defp long(m, k \\ nil), do: int_n(m, k, 8)
+  def long(m, k \\ nil), do: int_n(m, k, 8)
 
   @spec single(map, atom | nil) :: map | {map, float}
-  defp single(m, k \\ nil), do: float_n(m, k, 4)
+  def single(m, k \\ nil), do: float_n(m, k, 4)
 
   @spec double(map, atom | nil) :: map | {map, float}
-  defp double(m, k \\ nil), do: float_n(m, k, 8)
+  def double(m, k \\ nil), do: float_n(m, k, 8)
 
   @spec bool(map, atom | nil) :: map | {map, boolean}
-  defp bool(m, k \\ nil) do
+  def bool(m, k \\ nil) do
     {m, b} = int_n(m, nil, 1)
     put_or_return(m, k, not (b === 0))
   end
 
   @spec string(map, atom | nil) :: map | {map, binary}
-  defp string(m, k \\ nil) do
+  def string(m, k \\ nil) do
     {m, b} = byte(m)
 
     {m, s} =
@@ -189,7 +81,7 @@ defmodule OsuEx.Parser do
   end
 
   @spec bytes(map, atom) :: map | {map, binary}
-  defp bytes(m, k) do
+  def bytes(m, k) do
     {m, n} = int(m)
     <<v::binary-size(n), t::binary>> = m.data_
     put_or_return(%{m | data_: t}, k, v)
@@ -201,7 +93,7 @@ defmodule OsuEx.Parser do
   @ticks_per_ms 10000
 
   @spec datetime(map, atom | nil) :: map | {map, DateTime.t()}
-  defp datetime(m, k \\ nil) do
+  def datetime(m, k \\ nil) do
     {m, n} = long(m)
     ms_since_epoch = round((n - @epoch_ticks) / @ticks_per_ms)
     put_or_return(m, k, DateTime.from_unix!(ms_since_epoch, :millisecond))
@@ -209,11 +101,8 @@ defmodule OsuEx.Parser do
 
   # These ones never get stored directly, so they don't take a key.
 
-  @spec uleb(map) :: {map, integer}
-  defp uleb(m), do: uleb(m, 0, 0)
-
   @spec uleb(map, integer, integer) :: {map, integer}
-  defp uleb(m, acc, shift) do
+  def uleb(m, acc \\ 0, shift \\ 0) do
     # https://en.wikipedia.org/wiki/LEB128#Decode_unsigned_integer
     {m, b} = byte(m)
     acc = acc ||| (b &&& 0x7F) <<< shift
@@ -226,7 +115,7 @@ defmodule OsuEx.Parser do
   end
 
   @spec int_double(map) :: {map, {integer, float}}
-  defp int_double(m) do
+  def int_double(m) do
     {m, _} = byte(m)
     {m, i} = int(m)
     {m, _} = byte(m)
@@ -235,7 +124,7 @@ defmodule OsuEx.Parser do
   end
 
   @spec timing_point(map) :: {map, map}
-  defp timing_point(m) do
+  def timing_point(m) do
     {m, bpm} = double(m)
     {m, offset} = double(m)
     {m, not_inherited?} = bool(m)
@@ -245,7 +134,7 @@ defmodule OsuEx.Parser do
   @beatmap_version_cutoff 20_140_609
 
   @spec beatmap(map) :: {map, map}
-  defp beatmap(m) do
+  def beatmap(m) do
     # TODO: We can use this size to recover from faults.
     {m, size} = int(m)
     {m, artist} = string(m)
@@ -381,21 +270,21 @@ defmodule OsuEx.Parser do
   end
 
   @spec collection(map) :: {map, map}
-  defp collection(m) do
+  def collection(m) do
     {m, name} = string(m)
     {m, beatmaps} = multiple(m, &string/1)
     {m, %{name: name, beatmaps: beatmaps}}
   end
 
   @spec beatmap_scores(map) :: {map, map}
-  defp beatmap_scores(m) do
+  def beatmap_scores(m) do
     {m, beatmap_md5} = string(m)
     {m, scores} = multiple(m, &score/1)
     {m, %{beatmap_md5: beatmap_md5, scores: scores}}
   end
 
   @spec score(map) :: {map, map}
-  defp score(m) do
+  def score(m) do
     # TODO: This format is almost exactly the same as a .osr file,
     # except that there's no replay data.
     {m, mode} = byte(m)
