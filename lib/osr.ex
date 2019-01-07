@@ -53,7 +53,7 @@ defmodule OsuEx.Osr do
     scores_opts = [u: player, m: mode] ++ if(is_nil(mods), do: [], else: [mods: mods])
     replay_opts = if(is_nil(mods), do: [], else: [mods: mods])
 
-    with {:ok, [score]} <- API.get_scores(beatmap, scores_opts),
+    with {:ok, [%{replay_available: true} = score]} <- API.get_scores(beatmap, scores_opts),
          md5 when is_binary(md5) <-
            Keyword.get_lazy(opts, :h, fn ->
              case API.get_beatmap(beatmap) do
@@ -98,6 +98,7 @@ defmodule OsuEx.Osr do
     else
       {:ok, []} -> {:error, :score_not_found}
       {:ok, %{error: reason}} -> {:error, reason}
+      {:ok, [%{replay_available: false}]} -> {:error, :replay_not_available}
       {:ok, _} -> {:error, :invalid_replay}
       :error -> {:error, :invalid_replay}
       {:error, reason} -> {:error, reason}
