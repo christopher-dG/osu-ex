@@ -1,17 +1,15 @@
-defmodule OsuEx.API.Utils do
-  @moduledoc "Utility functions for handling enum values and mods."
-
-  use Bitwise, only_operators: true
+defmodule OsuEx.API.Enums do
+  @moduledoc "Utility functions for handling enum values."
 
   @doc """
   Translates the game mode enum to an atom and vice versa.
 
   ## Examples
 
-      iex> OsuEx.API.Utils.mode(0)
+      iex> OsuEx.API.Enums.mode(0)
       :standard
 
-      iex> OsuEx.API.Utils.mode(:taiko)
+      iex> OsuEx.API.Enums.mode(:taiko)
       1
   """
   def mode(_m)
@@ -33,10 +31,10 @@ defmodule OsuEx.API.Utils do
 
   ## Examples
 
-      iex> OsuEx.API.Utils.approved(-2)
+      iex> OsuEx.API.Enums.approved(-2)
       :graveyard
 
-      iex> OsuEx.API.Utils.approved(:wip)
+      iex> OsuEx.API.Enums.approved(:wip)
       -1
   """
   def approved(_a)
@@ -64,10 +62,10 @@ defmodule OsuEx.API.Utils do
 
   ## Examples
 
-      iex> OsuEx.API.Utils.genre(0)
+      iex> OsuEx.API.Enums.genre(0)
       :any
 
-      iex> OsuEx.API.Utils.genre(:unspecified)
+      iex> OsuEx.API.Enums.genre(:unspecified)
       1
   """
   def genre(_g)
@@ -101,10 +99,10 @@ defmodule OsuEx.API.Utils do
 
   ## Examples
 
-      iex> OsuEx.API.Utils.language(0)
+      iex> OsuEx.API.Enums.language(0)
       :any
 
-      iex> OsuEx.API.Utils.language(:other)
+      iex> OsuEx.API.Enums.language(:other)
       1
   """
   def language(_l)
@@ -142,10 +140,10 @@ defmodule OsuEx.API.Utils do
 
   ## Examples
 
-      iex> OsuEx.API.Utils.scoring_type(0)
+      iex> OsuEx.API.Enums.scoring_type(0)
       :score
 
-      iex> OsuEx.API.Utils.scoring_type(:accuracy)
+      iex> OsuEx.API.Enums.scoring_type(:accuracy)
       1
   """
   def scoring_type(_s)
@@ -167,10 +165,10 @@ defmodule OsuEx.API.Utils do
 
   ## Examples
 
-      iex> OsuEx.API.Utils.team_type(0)
+      iex> OsuEx.API.Enums.team_type(0)
       :head_to_head
 
-      iex> OsuEx.API.Utils.team_type(:tag_coop)
+      iex> OsuEx.API.Enums.team_type(:tag_coop)
       1
   """
   def team_type(_t)
@@ -192,10 +190,10 @@ defmodule OsuEx.API.Utils do
 
   ## Examples
 
-      iex> OsuEx.API.Utils.team(1)
+      iex> OsuEx.API.Enums.team(1)
       :blue
 
-      iex> OsuEx.API.Utils.team(:red)
+      iex> OsuEx.API.Enums.team(:red)
       2
   """
   def team(_t)
@@ -207,104 +205,4 @@ defmodule OsuEx.API.Utils do
   @spec team(atom) :: 1..2
   def team(:blue), do: 1
   def team(:red), do: 2
-
-  @mods [
-    :NF,
-    :EZ,
-    :TD,
-    :HD,
-    :HR,
-    :SD,
-    :DT,
-    :RL,
-    :HT,
-    :NC,
-    :FL,
-    :AT,
-    :SO,
-    :AP,
-    :PF,
-    :K4,
-    :K5,
-    :K6,
-    :K7,
-    :K8,
-    :FI,
-    :RN,
-    :CN,
-    :TG,
-    :K9,
-    :KC,
-    :K1,
-    :K3,
-    :K2,
-    :V2,
-    :LM
-  ]
-  @mod_to_num @mods
-              |> Enum.with_index()
-              |> Enum.map(fn {m, i} -> {m, round(:math.pow(2, i))} end)
-              |> Enum.into(%{})
-
-  @doc """
-  Translates bitwise mods into a list of atoms and vice versa.
-  This function does not handle the `KeyMod`, `FreeModAllowed`, or `ScoreIncreaseMods`.
-
-  ## Examples
-      iex> OsuEx.API.Utils.mods(24) |> elem(1) |> MapSet.to_list()
-      [:HD, :HR]
-
-      iex> OsuEx.API.Utils.mods([:DT, :FL])
-      {:ok, 1088}
-
-      iex> OsuEx.API.Utils.mods([:QQ])
-      {:error, {:unknown_mod, :QQ}}
-  """
-  def mods(_m)
-
-  @spec mods(0..2_147_483_647) :: {:ok, MapSet.t()}
-  def mods(n) when is_integer(n) do
-    l =
-      Enum.reduce(@mod_to_num, [], fn {m, i}, acc ->
-        if((i &&& n) === i, do: acc ++ [m], else: acc)
-      end)
-
-    l = if(Enum.member?(l, :NC), do: List.delete(l, :DT), else: l)
-    l = if(Enum.member?(l, :PF), do: List.delete(l, :SD), else: l)
-
-    {:ok, MapSet.new(l)}
-  end
-
-  @spec mods(Enum.t()) :: {:ok, 0..2_147_483_647} | {:error, {:unknown_mod, atom}}
-  def mods(l) when not is_integer(l) do
-    val =
-      Enum.reduce_while(l, 0, fn m, acc ->
-        case @mod_to_num[m] do
-          nil -> {:halt, {:error, {:unknown_mod, m}}}
-          n -> {:cont, acc + n}
-        end
-      end)
-
-    case val do
-      n when is_integer(n) ->
-        n =
-          if Enum.member?(l, :NC) and not Enum.member?(l, :DT) do
-            n + @mod_to_num[:DT]
-          else
-            n
-          end
-
-        n =
-          if Enum.member?(l, :PF) and not Enum.member?(l, :SD) do
-            n + @mod_to_num[:SD]
-          else
-            n
-          end
-
-        {:ok, n}
-
-      _ ->
-        val
-    end
-  end
 end
