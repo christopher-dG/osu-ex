@@ -8,5 +8,5 @@
 In `deps/0`:
 
 ```elixir
-{:osu_ex, github: "christopher-dG/osu-ex"}
+{:osu_ex, "~> 0.2""}
 ```
